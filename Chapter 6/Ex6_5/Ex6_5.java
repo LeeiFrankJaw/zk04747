@@ -7,6 +7,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTextField;
+import java.awt.event.KeyEvent;
+import javax.swing.KeyStroke;
+import javax.swing.JCheckBoxMenuItem;
+import java.util.function.Function;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+import javax.swing.AbstractButton;
 
 public class Ex6_5 implements ActionListener {
     static JButton jbt = new JButton("Open my Window of Sports & Entertainment");
@@ -39,9 +46,9 @@ public class Ex6_5 implements ActionListener {
 }
 
 
-class MenuWindow extends JFrame implements ActionListener {
+class MenuWindow extends JFrame implements ItemListener, ActionListener {
     JTextField jtf = new JTextField();
-    JMenuItem menuItemQuit = new JMenuItem("quit");
+    JMenuItem menuItemQuit = new JMenuItem("Quit");
 
     MenuWindow() {
         this("", 0, 0);
@@ -61,20 +68,27 @@ class MenuWindow extends JFrame implements ActionListener {
         JMenu menuBall = new JMenu("Ball");
         JMenuBar menuBar = new JMenuBar();
 
-        addItem(menuSports, "Running", this);
-        addItem(menuSports, "Jump Rope", this);
-        addItem(menuBall, "Baseball", this);
-        addItem(menuBall, "Basketball", this);
-        addItem(menuBall, "Football", this);
-        addItem(menuBall, "Soccer", this);
-        addItem(menuBall, "Volleyball", this);
+        addItem(menuSports, "Running");
+        addItem(menuSports, "Jump Rope");
+        addItem(menuBall, "Baseball");
+        addItem(menuBall, "Basketball");
+        addItem(menuBall, "Football");
+        addItem(menuBall, "Soccer");
+        addItem(menuBall, "Volleyball");
         menuSports.add(menuBall);
-        menuItemQuit.addActionListener(new quit());
+        menuItemQuit.addActionListener(new Quit());
+        menuItemQuit.setMnemonic(KeyEvent.VK_Q);
+        menuItemQuit.setAccelerator(
+            KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
         menuSports.add(menuItemQuit);
 
-        addItem(menuEntertain, "Singing", this);
-        addItem(menuEntertain, "Dancing", this);
-        addItem(menuEntertain, "Gaming", this);
+        JCheckBoxMenuItem sing = new JCheckBoxMenuItem("Singing");
+        // // sing.addItemListener(this);
+        // menuEntertain.add(sing);
+
+        addItem(menuEntertain, "Singing", JCheckBoxMenuItem::new);
+        addItem(menuEntertain, "Dancing", JCheckBoxMenuItem::new);
+        addItem(menuEntertain, "Gaming", JCheckBoxMenuItem::new);
 
         menuBar.add(menuSports);
         menuBar.add(menuEntertain);
@@ -87,21 +101,46 @@ class MenuWindow extends JFrame implements ActionListener {
         setLocationRelativeTo(Ex6_5.frame);
     }
 
-    private void addItem(JMenu menu, String menuName, ActionListener listener) {
-        JMenuItem menuItem = new JMenuItem(menuName);
+    private void addItem(JMenu menu, String menuName, Function<String, JMenuItem> constr) {
+        JMenuItem menuItem = constr.apply(menuName);
 
-        menuItem.setActionCommand(menuName);
-        menuItem.addActionListener(listener);
+        if (menuItem.getClass() == JMenuItem.class) {
+            menuItem.addActionListener(this);
+        } else {
+            menuItem.addItemListener(this);
+        }
+
         menu.add(menuItem);
     }
 
-    public void actionPerformed(ActionEvent e) {
-        jtf.setText(e.getActionCommand() + " is selected!");
+    private void addItem(JMenu menu, String menuName) {
+        addItem(menu, menuName, JMenuItem::new);
     }
+
+    public void actionPerformed(ActionEvent e) {
+        String name = ((AbstractButton) e.getSource()).getText();
+        jtf.setText(name + " is selected!");
+    }
+
+
+    // Implementation of java.awt.event.ItemListener
+
+    /**
+     * Describe <code>itemStateChanged</code> method here.
+     *
+     * @param itemEvent an <code>ItemEvent</code> value
+     */
+    public final void itemStateChanged(final ItemEvent itemEvent) {
+        String name = ((AbstractButton) itemEvent.getSource()).getText();
+        String prefix = (itemEvent.getStateChange() == ItemEvent.SELECTED)
+                ? "" : "de";
+        jtf.setText(name + " is " + prefix + "selected!");
+    }
+
 }
 
 
-class quit implements ActionListener {
+class Quit implements ActionListener {
     public void actionPerformed(ActionEvent e) {
             System.exit(0);
     }

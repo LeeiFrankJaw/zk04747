@@ -14,7 +14,7 @@ class MyFrameEx6_1 extends JFrame {
         setLayout(new FlowLayout());
         add(new JCheckBox("Soccer"));
         add(new JCheckBox("Volleyball"));
-        add(new JCheckBox("Basketball"));
+        add(new JCheckBox("Basketball", true));
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 360);

@@ -16,16 +16,16 @@ public class Ex6_4 {
 }
 
 
-class ComboBoxDemo extends JFrame implements ActionListener, ItemListener {
+class ComboBoxDemo extends JFrame implements ActionListener {
     final static int WIDTH = 350;
     final static int HEIGHT = 150;
     String[] proList = {"play soccer", "play basketball", "play volleyball"};
-    JComboBox jcb = new JComboBox(proList);
+    JComboBox<String> jcb = new JComboBox<>(proList);
     JTextField jtf = new JTextField(10);
+    int prevIndex = -1;
 
     ComboBoxDemo() {
         jcb.addActionListener(this);
-        jcb.addItemListener(this);
         jcb.setEditable(true);
 
         add(jcb);
@@ -47,13 +47,15 @@ class ComboBoxDemo extends JFrame implements ActionListener, ItemListener {
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == jcb) {
-            jtf.setText(jcb.getSelectedItem().toString());
+            String item = (String) jcb.getSelectedItem();
+            int index = jcb.getSelectedIndex();
+            if (index == -1) {
+                jcb.insertItemAt(item, prevIndex+1);
+            } else {
+                jtf.setText(item);
+                prevIndex = index;
+            }
         }
     }
 
-    public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() == jcb) {
-            jtf.setText(jcb.getSelectedItem().toString());
-        }
-    }
 }
